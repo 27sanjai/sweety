@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Birthday Surprise 🎉</title>
+
+<style>
+body {
+  margin: 0;
+  background: black;
+  color: white;
+  text-align: center;
+  font-family: Arial;
+}
+
+h1 {
+  margin-top: 20px;
+  font-size: 40px;
+}
+
+/* Name Animation */
+.name {
+  font-size: 30px;
+  color: gold;
+  animation: bounce 1s infinite alternate, glow 2s infinite alternate;
+}
+
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-15px); }
+}
+
+@keyframes glow {
+  from { text-shadow: 0 0 10px yellow; }
+  to { text-shadow: 0 0 30px orange; }
+}
+
+/* Typing */
+#typing {
+  margin-top: 20px;
+  font-size: 22px;
+  color: pink;
+}
+
+/* Slideshow */
+.slideshow {
+  width: 250px;
+  height: 250px;
+  margin: auto;
+  margin-top: 20px;
+  position: relative;
+}
+
+.slideshow img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  opacity: 0;
+  transition: 1s;
+}
+
+.active {
+  opacity: 1;
+}
+
+/* Canvas */
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+</style>
+</head>
+
+<body onclick="document.querySelector('audio').play()">
+
+<h1>🎂 Happy Birthday 🎉</h1>
+<h2 class="name">💖 Happy Birthday Akka 💖</h2>
+
+<h3 id="typing"></h3>
+
+<div class="slideshow">
+  <img src="photo1.jpg" class="active">
+  <img src="photo2.jpg">
+  <img src="photo3.jpg">
+</div>
+
+<audio loop>
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<canvas id="canvas"></canvas>
+
+<script>
+// Typing
+const text = "You are special and unforgettable 💖";
+let i = 0;
+function type() {
+  if (i < text.length) {
+    document.getElementById("typing").innerHTML += text[i];
+    i++;
+    setTimeout(type, 80);
+  }
+}
+type();
+
+// Slideshow
+let slides = document.querySelectorAll(".slideshow img");
+let index = 0;
+setInterval(() => {
+  slides[index].classList.remove("active");
+  index = (index + 1) % slides.length;
+  slides[index].classList.add("active");
+}, 2000);
+
+// Canvas setup
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// Fireworks
+let particles = [];
+function firework(x, y) {
+  for (let i = 0; i < 40; i++) {
+    particles.push({
+      x, y,
+      dx: (Math.random() - 0.5) * 5,
+      dy: (Math.random() - 0.5) * 5,
+      life: 100
+    });
+  }
+}
+
+canvas.addEventListener("click", e => {
+  firework(e.clientX, e.clientY);
+});
+
+// Confetti
+let confetti = [];
+function createConfetti() {
+  confetti.push({
+    x: Math.random() * canvas.width,
+    y: 0,
+    size: Math.random() * 5,
+    speed: Math.random() * 3 + 2
+  });
+}
+
+function draw() {
+  ctx.fillStyle = "rgba(0,0,0,0.2)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // fireworks
+  particles.forEach((p, i) => {
+    p.x += p.dx;
+    p.y += p.dy;
+    p.life--;
+    ctx.fillRect(p.x, p.y, 2, 2);
+    if (p.life <= 0) particles.splice(i, 1);
+  });
+
+  // confetti
+  createConfetti();
+  confetti.forEach((c, i) => {
+    c.y += c.speed;
+    ctx.fillRect(c.x, c.y, c.size, c.size);
+    if (c.y > canvas.height) confetti.splice(i, 1);
+  });
+
+  requestAnimationFrame(draw);
+}
+
+draw();
+</script>
+
+</body>
+</html>
